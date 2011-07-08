@@ -4,6 +4,7 @@
   <meta charset='utf-8'>
 
   <title>JamieLottering/Relay-JS @ GitHub</title>
+  <link rel="stylesheet" href="relay.css" type="text/css">
 
   <style type="text/css">
     body {
@@ -21,7 +22,6 @@
     h1 a { text-decoration: none }
     h2 { font-size: 1.5em; color: #c4eaa9; }
     h3 { text-align: center; color: #c4eaa9; }
-    a { color: #c4eaa9; }
     .description { font-size: 1.2em; margin-bottom: 30px; margin-top: 30px; font-style: italic;}
     .download { float: right; }
     pre { background: #000; color: #fff; padding: 15px;}
@@ -79,5 +79,24 @@ try {
 var pageTracker = _gat._getTracker("UA-24361223-2");
 pageTracker._trackPageview();
 } catch(err) {}</script>
+
+<script src="jquery.js" type="text/javascript" charset="utf-8"></script>
+<script src="relay.js" type="text/javascript" charset="utf-8"></script>
+<script type="text/javascript">
+  $(function () {
+    new Relay('alert', {
+      text : 'Welcome to Relay JS. Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
+      oktext: 'Continue &raquo;',
+      ok: function () {
+        return new Relay('alert', {
+          text: 'As you can see, Relays are easy to chain together.<br><br>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam.',
+          oktext: 'Close.',
+          theme: 'nes'
+        });
+      },
+      theme : 'nes'
+    });
+  });
+</script>
 </body>
 </html>
