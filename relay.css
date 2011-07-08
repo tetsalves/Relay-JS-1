@@ -3,32 +3,19 @@
   padding: 0;
 }
 
-a {
-  background-color: #efefef;
-  display: block;
-  font-weight: bold;
-  padding: 5px;
-}
-
+/* Themes */
 .relay_wrapper {
   background-color: rgba(0, 0, 0, .3);
   color: #333;
-  display: none;
   font-size: 12px;
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-  height: 100%;
-  left: 0;
-  position: fixed;
-  top: 0;
-  width: 100%;
 }
 
 .relay_container {
   background-color: #f9f9f9;
   border: 1px solid #464646;
-  position: absolute;
+  max-width: 600px;
   min-width: 240px;
-  top: 100px;
   border-radius: 1px;
   -moz-border-radius: 1px;
   -webkit-border-radius: 1px;
@@ -47,17 +34,10 @@ a {
     background-color: #e5e5e5;
     border: 1px solid #a5a5a5;
     color: #333;
-    cursor: pointer;
-    display: -moz-inline-stack;
-    display: inline-block;
-    *display: inline;
     font-size: 13px;
     margin-left: 8px;
-    overflow: visible;
     padding: 3px 10px;
     text-align: center;
-    zoom: 1;
-    width: auto;
     border-radius: 1px;
     -moz-border-radius: 1px;
     -webkit-border-radius: 1px;
@@ -73,17 +53,57 @@ a {
     }
     .relay_actions button:focus {
       border-color: #40b5e2;
-      outline: 0;
       box-shadow: 0 0 5px #40b5e2;
       -moz-box-shadow: 0 0 5px #40b5e2;
       -webkit-box-shadow: 0 0 5px #40b5e2;
     }
 
 .relay_content {
+  max-height: 300px;
+  overflow: auto;
   padding: 24px;
   text-align: center;
 }
 
+/* Critical */
+.relay_wrapper {
+  display: none;
+  height: 100%;
+  left: 0;
+  position: fixed;
+  top: 0;
+  width: 100%;
+}
+
+.relay_container {
+  position: absolute;
+  top: 100px;
+}
+
+.relay_actions button {
+  cursor: pointer;
+  display: -moz-inline-stack;
+  display: inline-block;
+  *display: inline;
+  line-height: normal;
+  overflow: visible;
+  *overflow: visible;
+  zoom: 1;
+  vertical-align: baseline;
+  *vertical-align: middle;
+  width: auto;
+  -webkit-appearance: button;
+}
+  .relay_actions button:focus {
+    outline: 0;
+  }
+
+button::-moz-focus-inner {
+  border: 0;
+  padding: 0;
+}
+
+/* ZSNES Theme */
 @font-face {
     font-family: 'wendyRegular';
     src: url('wendy-webfont.eot');
@@ -108,13 +128,24 @@ a {
     color: #fff;
     font-family: 'wendyRegular', 'Helvetica', sans-serif;
     font-size: 18px;
+    padding: 7px 15px;
     text-align: center;
+    text-shadow: #1f153e 1px 1px 0;
     box-shadow: none;
     -moz-box-shadow: none;
     -webkit-box-shadow: none;
   }
+  .relay_theme_nes button:hover {
+    background: #4d359a;
+  }
+  .relay_theme_nes button:focus {
+    border-color: #fb007e;
+    box-shadow: 0 0 5px #fb007e;
+    -moz-box-shadow: 0 0 5px #fb007e;
+    -webkit-box-shadow: 0 0 5px #fb007e;
+  }
   .relay_theme_nes button:active {
-    background-color: #a00050;
+    background: #1f153e;
     border-top-color: rgba(0, 0, 0, .5);
     border-left-color: rgba(0, 0, 0, .5);
   }
@@ -137,7 +168,7 @@ a {
   .relay_theme_nes .relay_content {
     color: #fff;
     text-align: left;
-    text-shadow: #484440 2px 2px 0;
+    text-shadow: #1f153e 2px 2px 0;
   }
   .relay_theme_nes .relay_textbox {
     background: #181031;
@@ -149,5 +180,6 @@ a {
     font-size: 18px;
     margin-top: 10px;
     padding: 5px;
+    text-shadow: #000 1px 1px 0;
     width: 300px;
   }
