@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset='utf-8'>
+
+  <title>Relay.js</title>
+  <link rel="stylesheet" href="relay.css" type="text/css">
+  <script src="jquery.js" type="text/javascript" charset="utf-8"></script>
+  <script src="relay.js" type="text/javascript" charset="utf-8"></script>
+  <script type="text/javascript">
+    $(function () {
+      $('.alert').live('click', function (e) {
+        new Relay('alert', {
+          text : 'Access to here is denied.',
+          theme : 'nes'
+        });
+        return false;
+      });
+
+      $('.confirm').live('click', function (e) {
+        new Relay('confirm', {
+          text : 'Please choose Yes or No',
+          theme : 'nes',
+          yes : function () {
+            console.log('Yippeee!!!');
+          },
+          no : function () {
+            console.log('wtf!!');
+          }
+        });
+        return false;
+      });
+
+      // Example of a (potentially neverending) dialog loop
+      function _startMaze() {
+        // Prompt the user to type 'foo'
+        return new Relay('prompt', {
+          text : 'Type foo:',
+          theme : 'nes',
+
+          // Set a watch for 'foo'
+          watch : {
+            'foo' : function (value) {
+              // User has typed 'foo', open an alert window.
+              return new Relay('alert', {
+                text: 'You are not allowed to type foo!',
+                ok: function () {
+                  // User clicks ok. Ask if they understand.
+                  return new Relay('prompt', {
+                    text: 'Do you understand?',
+                    theme: 'nes',
+                    watch: {
+                      // Watch for 'yes' and 'no'
+                      'no': function () {
+                        return new Relay('confirm', {
+                          text: 'You will learn to understand.',
+                          yestext: 'Yes sir...',
+                          notext: 'Please, have mercy...',
+                          // Continue until user learns their lesson.
+                          yes: function () {
+                            _startMaze();
+                          },
+                          theme: 'nes'
+                        });
+                      },
+                      'yes': function () {
+                        return new Relay('alert', {
+                          text: 'You have successfully navigated a maze of boxes.',
+                          oktext: 'Hurray!',
+                          theme : 'nes'
+                        });
+                      }
+                    }
+                  });
+                },
+                oktext: 'Aww, shucks',
+                theme: 'nes'
+              });
+            }
+          }
+        });
+      }
+      // You can chain Relays indefinitely
+      $('.prompt').live('click', function (e) {
+        // Prompt the user to type 'foo'
+        _startMaze();
+        return false;
+      });
+    });
+  </script>
+</head>
+
+<a class="alert" href="#">Relay an alert</a>
+<a class="confirm" href="#">Relay a confirmation</a>
+<a class="prompt" href="#">Relay a prompter</a>
+
+</body>
+</html>
