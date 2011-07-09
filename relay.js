@@ -1,4 +1,4 @@
-(function ( $, window, undefined ){
+(function ( $, window, undefined ) {
 
 var templates = {
   alert: [
@@ -47,10 +47,13 @@ var templates = {
 };
 
 
-var noop = function () {};
+var noop = function (wrapper) {
+  wrapper.fadeOut(200);
+};
 
 var defaults = {
   content    : '',
+  chain      : [],
   theme      : 'default',
   type       : 'text',
   ok         : noop,
@@ -64,129 +67,185 @@ var defaults = {
   watch      : {}
 };
 
-$('.relay_container button').live('click.relay', function (e) {
-  _handleRelayAction($(this));
-  return false;
-}).live('keydown.relay', function (e) {
-  if ($(this).hasClass('relay_focus')) {
-    switch (e.keyCode) {
-      case 13:
-        _handleRelayAction($(this));
-        return false;
-      break;
-    }
-  }
-}).live('focusin.relay', function (e) {
-  $(this).addClass('relay_focus');
-}).live('focusout.relay', function (e) {
-  $(this).removeClass('relay_focus');
-});
+// $('.relay_form').live('submit', function (e) {
+//   _handleRelayAction($(this).find('.relay_action_ok'));
+//   return false;
+// });
+// 
+// function _handleRelayAction(el) {
 
-$('.relay_form').live('submit', function (e) {
-  _handleRelayAction($(this).find('.relay_action_ok'));
-  return false;
-});
-
-function _handleRelayAction(el) {
-  var name = el.attr('name');
-  var data = el.data('relay:settings');
-  var relay = el.parents('.relay_wrapper').first();
-  var answer = '';
-  var valid = true;
-  var watch = null;
-
-  if(relay.find('.relay_textbox').length) {
-    answer = relay.find('.relay_textbox').val();
-    if(data.watch && typeof data.watch[answer] === 'function') {
-      watch = data.watch[answer].call(el, answer);
-      valid = false;
-    }
-  }
-
-  if (valid === true) {
-    if(typeof data[name] === 'function') data[name].call(el, answer);
-    if (!watch || !watch instanceof Relay) {
-      el.parents('.relay_wrapper').fadeOut(200, function () {
-        $(this).remove();
-      });
-    }
-  }
-}
-
-function _appendRelay(html, settings) {
-  var relay   = $(html);
-  var actions = relay.find('button');
- 
-  var ok = relay.find('.relay_action_ok');
-  var textbox = relay.find('.relay_textbox');
-
-  actions.data('relay:settings', settings);
-
-  if($('#relay_wrapper').length) {
-    $('#relay_wrapper').remove();
-  }
-
-  $('body').append(relay);
-
-  relay.show();
-  _position(relay);
-  relay.hide();
-
-  relay.show();
-  textbox.length ? textbox.focus() : ok.focus();
-}
-
-function _position(relay) {
-  var
-    relay      = relay.find('.relay_container'),
-    winWidth   = $(window).width(),
-    winHeight  = $(window).height()
-  ;
-
-  var finalWidth = (winWidth / 2) - relay.outerWidth() / 2;
-  var finalHeight = (winHeight / 2) - relay.outerHeight() / 2;
-
-  relay.css({ left: finalWidth + 'px' });
-}
-
-function _makeTemplate(template, settings) {
-  var html = template;
-  for (var o in settings) {
-    html = html.replace('{{ ' + o + ' }}', settings[o].length ? settings[o] : defaults[o]);
-  }
-  return html;
-}
+// }
 
 var Relay = function(method, settings) {
-  this.init = false;
+  var relay = this;
 
-  if (this.init) return this;
-
-  var template = '';
-
+  if (relay.init) return relay;
   if (!method || !settings) return false;
 
-  settings = $.extend({}, defaults, settings);
+  relay.settings  = $.extend({}, defaults, settings);
+  relay.settings.theme = 'relay_theme_' + settings.theme.replace('relay_theme', '');
 
-  settings.theme = 'relay_theme_' + settings.theme;
+  relay.elements = {};
+  relay.template = '';
+  relay.chain       = settings.chain;
+  relay.chainbackup = function () { return settings.chain; };
+  relay.rendered = '';
 
   switch(typeof method) {
     case 'string':
-      template = _makeTemplate(templates[method], settings);
-      _appendRelay(template, settings);
+      relay._setTemplate(templates[method])
+           ._makeTemplate()
+           ._attach();
     break;
     default:
     break;
   };
 
-  this.init = true;
+  relay.init = true;
 
+  return relay;
+}
+
+Relay.p = Relay.prototype = {
+  init        : false,
+  chain       : [],
+  elements    : {},
+  theme       : 'default',
+  rendered    : '',
+  template    : '',
+  constructor : Relay
+};
+
+Relay.p.set = function(settings) {
+  var relay = this;
+  var els   = relay.elements;
+  var defaults = {
+    text   : relay.settings.text,
+    restart: false
+  };
+
+  settings = $.extend({}, defaults, settings);
+
+  els.header.text(settings.text);
+
+  if(settings.restart === true) {
+    relay.chain = relay.chainbackup;
+  }
+
+};
+
+Relay.p._makeTemplate = function() {
+  var html = this.template;
+  for (var o in this.settings) {
+    html = html.replace('{{ ' + o + ' }}', this.settings[o].length ? this.settings[o] : defaults[o]);
+  }
+
+  this.rendered = html;
   return this;
 }
 
-Relay.prototype = {
-  constructor: Relay
-};
+Relay.p._setTemplate = function(template) {
+  this.template = template;
+  return this;
+}
+
+Relay.p._attach = function() {
+  var relay = this;
+
+  relay.elements.wrapper   = $(relay.rendered);
+  relay.elements.actions   = relay.elements.wrapper.find('button');
+  relay.elements.ok        = relay.elements.wrapper.find('.relay_action_ok');
+  relay.elements.textbox   = relay.elements.wrapper.find('.relay_textbox');
+  relay.elements.container = relay.elements.wrapper.find('.relay_container');
+  relay.elements.header    = relay.elements.container.find('.relay_header');
+
+  $('body').append(relay.elements.wrapper);
+
+  relay._position();
+
+  relay.elements.textbox.length ? relay.elements.textbox.focus() : relay.elements.ok.focus();
+  relay.elements.wrapper.fadeIn(200);
+
+
+  relay.elements.actions.bind('click.relay', function (e) {
+    relay._handleRelayAction($(this));
+    return false;
+  }).bind('keydown.relay', function (e) {
+    if ($(this).hasClass('relay_focus')) {
+      switch (e.keyCode) {
+        case 13:
+          relay._handleRelayAction($(this));
+          return false;
+        break;
+      }
+    }
+  }).bind('focusin.relay', function (e) {
+    $(this).addClass('relay_focus');
+  }).bind('focusout.relay', function (e) {
+    $(this).removeClass('relay_focus');
+  });
+
+  return relay;
+}
+
+Relay.p._position = function() {
+
+  var
+    relay      = this,
+    container  = relay.elements.container,
+    winWidth   = $(window).width(),
+    winHeight  = $(window).height()
+  ;
+
+  relay.elements.wrapper.show();
+
+  var finalWidth = (winWidth / 2) - container.outerWidth() / 2;
+  var finalHeight = (winHeight / 2) - container.outerHeight() / 2;
+
+  container.css({ left: finalWidth + 'px' });
+  relay.elements.wrapper.hide();
+
+  return relay;
+}
+
+Relay.p._handleRelayAction = function(el) {
+  var relay   = this;
+  var name    = el.attr('name');
+  var data    = relay.settings;
+  var wrapper = relay.elements.wrapper;
+  var answer  = '';
+  var valid   = true;
+  var watch   = data.watch;
+
+  if(relay.elements.textbox.length) {
+    answer = relay.elements.textbox.val();
+    if(data.watch && typeof data.watch[answer] === 'function') {
+      watch = data.watch[answer].call(relay, wrapper, answer);
+      valid = false;
+    }
+  }
+
+  if (valid === true) {
+    if (relay.chain && relay.chain.length) {
+      var currentCallback = (function (chain) { return chain.shift(); })(relay.chain);
+      switch(typeof currentCallback) {
+        case 'function':
+          // if(typeof data[name] === 'function') data[name].call(this, wrapper, answer);
+        break;
+        case 'object':
+          if(typeof currentCallback[name] === 'function') c = currentCallback[name].call(relay, wrapper);
+        break;
+      }
+      return relay;
+    } else {
+      if(typeof data[name] === 'function') data[name].call(relay, wrapper);
+    }
+
+    el.parents('.relay_wrapper').fadeOut(200, function () {
+      $(this).remove();
+    });
+  }
+}
 
 window.Relay = Relay;
 

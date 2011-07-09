@@ -10,17 +10,35 @@
   <script type="text/javascript">
     $(function () {
       $('.alert').live('click', function (e) {
-        new Relay('alert', {
-          text : 'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
-          oktext: 'Continue &raquo;',
-          ok: function () {
-            return new Relay('alert', {
-              text: 'As you can see, Relays are easy to chain together.<br><br>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam.',
-              oktext: 'Close.',
-              theme: 'nes'
-            });
-          },
-          theme : 'nes'
+        new Relay('confirm', {
+          text: 'Test alert chains.',
+          theme: 'nes',
+          chain: [
+            {
+              yes: function() {
+                this.set({
+                  text: 'You have clicked yes once.'
+                });
+              },
+              no: function() {
+                this.set({
+                  text: 'Seriously?'
+                });
+              }
+            },
+            {
+              yes: function() {
+                this.set({
+                  text: 'You have clicked yes twice.'
+                });
+              },
+              no: function() {
+                this.set({
+                  text: 'Stop clicking no.'
+                });
+              }
+            }
+          ]
         });
         return false;
       });
@@ -30,15 +48,13 @@
           text : 'Please choose an option',
           theme : 'nes',
           yes : function () {
-            return new Relay('alert', {
-              text: 'Excellent choice.',
-              theme: 'nes'
+            this.set({
+              text: 'Excellent choice.'
             });
           },
           no : function () {
-            return new Relay('alert', {
-              text: 'Poor choice.',
-              theme: 'nes'
+            this.set({
+              text: 'Poor choice.'
             });
           }
         });
@@ -54,42 +70,8 @@
 
           // Set a watch for 'foo'
           watch : {
-            'foo' : function (value) {
-              // User has typed 'foo', open an alert window.
-              return new Relay('alert', {
-                text: 'You are not allowed to type foo!',
-                ok: function () {
-                  // User clicks ok. Ask if they understand.
-                  return new Relay('prompt', {
-                    text: 'Do you understand?',
-                    theme: 'nes',
-                    watch: {
-                      // Watch for 'yes' and 'no'
-                      'no': function () {
-                        return new Relay('confirm', {
-                          text: 'You will learn to understand.',
-                          yestext: 'Yes sir...',
-                          notext: 'Please, have mercy...',
-                          // Continue until user learns their lesson.
-                          yes: function () {
-                            _startMaze();
-                          },
-                          theme: 'nes'
-                        });
-                      },
-                      'yes': function () {
-                        return new Relay('alert', {
-                          text: 'You have successfully navigated a maze of boxes.',
-                          oktext: 'Hurray!',
-                          theme : 'nes'
-                        });
-                      }
-                    }
-                  });
-                },
-                oktext: 'Aww, shucks',
-                theme: 'nes'
-              });
+            'foo' : function (wrapper, value) {
+              console.log(value);
             }
           }
         });
