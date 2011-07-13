@@ -9,85 +9,52 @@
   <script src="relay.js" type="text/javascript" charset="utf-8"></script>
   <script type="text/javascript">
     $(function () {
-      $('.alert').live('click', function (e) {
-        
+      
+      window.Foo = new Relay('alert', {
+        text: 'I am a cool dude.',
+        oktext: 'LOL',
+
+        ok: function () {
+          console.log('User clicked OK');
+        },
+
+        onShow: function () {
+          console.log(this, ' is showing.');
+        },
+        onClose: function() {
+          console.log(this, ' is closing.');
+        }
       });
-      // 
-      // $('.confirm').live('click', function (e) {
-      //   new Relay('confirm', {
-      //     text : 'Please choose an option',
-      //     theme : 'nes',
-      //     yes : function () {
-      //       return new Relay('alert', {
-      //         text: 'Excellent choice.',
-      //         theme: 'nes'
-      //       });
-      //     },
-      //     no : function () {
-      //       return new Relay('alert', {
-      //         text: 'Poor choice.',
-      //         theme: 'nes'
-      //       });
-      //     }
-      //   });
-      //   return false;
-      // });
-      // 
-      // // Example of a (potentially neverending) dialog loop
-      // function _startMaze() {
-      //   // Prompt the user to type 'foo'
-      //   return new Relay('prompt', {
-      //     text : 'Type foo:',
-      //     theme : 'nes',
-      // 
-      //     // Set a watch for 'foo'
-      //     watch : {
-      //       'foo' : function (value) {
-      //         // User has typed 'foo', open an alert window.
-      //         return new Relay('alert', {
-      //           text: 'You are not allowed to type foo!',
-      //           ok: function () {
-      //             // User clicks ok. Ask if they understand.
-      //             return new Relay('prompt', {
-      //               text: 'Do you understand?',
-      //               theme: 'nes',
-      //               watch: {
-      //                 // Watch for 'yes' and 'no'
-      //                 'no': function () {
-      //                   return new Relay('confirm', {
-      //                     text: 'You will learn to understand.',
-      //                     yestext: 'Yes sir...',
-      //                     notext: 'Please, have mercy...',
-      //                     // Continue until user learns their lesson.
-      //                     yes: function () {
-      //                       _startMaze();
-      //                     },
-      //                     theme: 'nes'
-      //                   });
-      //                 },
-      //                 'yes': function () {
-      //                   return new Relay('alert', {
-      //                     text: 'You have successfully navigated a maze of boxes.',
-      //                     oktext: 'Hurray!',
-      //                     theme : 'nes'
-      //                   });
-      //                 }
-      //               }
-      //             });
-      //           },
-      //           oktext: 'Aww, shucks',
-      //           theme: 'nes'
-      //         });
-      //       }
-      //     }
-      //   });
-      // }
-      // // You can chain Relays indefinitely
-      // $('.prompt').live('click', function (e) {
-      //   // Prompt the user to type 'foo'
-      //   _startMaze();
-      //   return false;
-      // });
+
+      window.Bar = new Relay('confirm', {
+        text: 'Do you confirm?',
+        yes: function() {
+          console.log('User clicked YES');
+        },
+        no: function() {
+          console.log('User clicked NO');
+        }
+      });
+
+      window.Baz = new Relay('prompt', {
+        text: 'Please type something'
+      });
+
+      $('.alert').live('click', function (e) {
+        Foo.show();
+        return false;
+      });
+
+      $('.confirm').live('click', function (e) {
+        Bar.show();
+        return false;
+      });
+
+      $('.prompt').live('click', function (e) {
+        Baz.show();
+        return false;
+      });
+
     });
   </script>
 </head>
